@@ -2,25 +2,21 @@
 Main module for converting between numbers and Tagalog words.
 """
 
+import re
 from .utils import validate_number
 
-def tagalog_number(number):
+def digits_to_tagalog_number(number):
     """
     Translates English numbers (integers) to Tagalog worded numbers,
-    correcting grammatical usage of 'at', 'daan/'raan', and ligatures for larger numbers.
+    correcting grammatical usage of 'at', 'daan'/'raan', and ligatures for larger numbers.
 
     Args:
         number (int): The English number to translate. Supports up to billions.
 
     Returns:
         str: The Tagalog worded number, or an error message if the number is out of scope.
-
-    Examples:
-        >>> tagalog_number(123)
-        "isang daan at dalawampu't tatlo"
-        >>> tagalog_number(4567)
-        "apat na libo't limang daan at animnapu't pito"
     """
+
     validation_result = validate_number(number)
     if validation_result != "valid":
         return validation_result
@@ -42,9 +38,10 @@ def tagalog_number(number):
         10: "sampu"
     }
 
+    # Helper function to apply 'ng' or 'na' ligature to a number phrase
     def apply_ligature_and_determine_hundred(num_phrase, is_prefix_for_hundred=False):
         if not num_phrase:
-            return "", "daan"
+            return "", "daan" # Default to daan if no number word
 
         last_word = num_phrase.split()[-1]
 
@@ -64,6 +61,7 @@ def tagalog_number(number):
         
         return ligatured_phrase, hundred_word
 
+    # Function to convert numbers from 1 to 999
     def convert_hundreds_block(n):
         if n == 0:
             return ""
@@ -71,6 +69,7 @@ def tagalog_number(number):
         parts = []
         original_n = n
 
+        # Hundreds (100-999)
         if n >= 100:
             hundreds_val = n // 100
             remainder = n % 100
@@ -84,6 +83,7 @@ def tagalog_number(number):
             
             n = remainder
 
+        # Tens and Units (0-99)
         if n > 0:
             current_sub_part = ""
             if 1 <= n <= 10:
@@ -91,16 +91,25 @@ def tagalog_number(number):
             elif 11 <= n <= 19:
                 unit = n % 10
                 unit_word = basic_numerals[unit]
-                if unit_word[0] in 'aeiou':
-                    current_sub_part = f"labing-{unit_word}"
-                elif unit_word[0] == 'o':
-                    current_sub_part = f"labing-{unit_word}"
-                elif unit_word[0] in 'dt':
-                    current_sub_part = f"labin{unit_word}"
-                elif unit_word[0] == 'p':
-                    current_sub_part = f"labim{unit_word}"
-                else:
-                    current_sub_part = f"labing-{unit_word}"
+                # Special cases for teens
+                if unit_word == "isa":
+                    current_sub_part = "labing-isa"
+                elif unit_word == "dalawa":
+                    current_sub_part = "labindalawa"
+                elif unit_word == "tatlo":
+                    current_sub_part = "labintatlo"
+                elif unit_word == "apat":
+                    current_sub_part = "labing-apat"
+                elif unit_word == "lima":
+                    current_sub_part = "labinlima"
+                elif unit_word == "anim":
+                    current_sub_part = "labing-anim"
+                elif unit_word == "pito":
+                    current_sub_part = "labimpito"
+                elif unit_word == "walo":
+                    current_sub_part = "labingwalo"
+                elif unit_word == "siyam":
+                    current_sub_part = "labinsiyam"
             elif 20 <= n <= 99:
                 tens_digit = n // 10
                 unit_digit = n % 10
@@ -128,8 +137,9 @@ def tagalog_number(number):
                 else:
                     current_sub_part = f"{tens_word}'t {basic_numerals[unit_digit]}"
             
+            # Connect hundreds to tens/units with 'at' only if needed
             if original_n >= 100 and n > 0:
-                 parts.append("at")
+                parts.append("at")
             
             parts.append(current_sub_part)
             
@@ -151,8 +161,6 @@ def tagalog_number(number):
         million_val = number // 1_000_000
         million_phrase = convert_hundreds_block(million_val)
         if million_phrase:
-            if final_output_parts and (number > 0 or (number == 0 and billion_val > 0)):
-                final_output_parts.append("at")
             ligatured_million_phrase, _ = apply_ligature_and_determine_hundred(million_phrase)
             final_output_parts.append(f"{ligatured_million_phrase} milyon")
         number %= 1_000_000
@@ -162,20 +170,24 @@ def tagalog_number(number):
         thousand_val = number // 1_000
         thousand_phrase = convert_hundreds_block(thousand_val)
         if thousand_phrase:
-            if final_output_parts and (number > 0 or (number == 0 and (billion_val > 0 or million_val > 0))):
-                final_output_parts.append("at") 
             ligatured_thousand_phrase, _ = apply_ligature_and_determine_hundred(thousand_phrase)
             final_output_parts.append(f"{ligatured_thousand_phrase} libo")
         number %= 1_000
 
+    # Remaining hundreds, tens, and units
     if number > 0:
         remaining_phrase = convert_hundreds_block(number)
         if remaining_phrase:
-            if final_output_parts:
-                final_output_parts.append("at")
             final_output_parts.append(remaining_phrase)
 
-    return " ".join(final_output_parts).strip()
+    # Join and clean up the result
+    result = " ".join(final_output_parts)
+    result = re.sub(r'\s+', ' ', result).strip()
+    
+    # Apply contraction for "libo" followed by another number component
+    result = re.sub(r'\blibo\s+(\S)', r"libo't \1", result)
+    
+    return result
 
 def tagalog_number_to_digits(tagalog_str):
     """
@@ -187,7 +199,6 @@ def tagalog_number_to_digits(tagalog_str):
     Returns:
         int: The converted number, or None if conversion fails
     """
-    # This is a basic implementation - would need expansion for full functionality
     word_to_num = {
         'sero': 0,
         'isa': 1, 'isang': 1,
