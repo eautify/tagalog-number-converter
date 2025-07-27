@@ -1,5 +1,5 @@
 import unittest
-from tagalog_number.converter import tagalog_number
+from tagalog_number.converter import tagalog_number, tagalog_number_to_digits
 
 class TestTagalogNumberConverter(unittest.TestCase):
     def test_basic_numbers(self):
@@ -43,6 +43,13 @@ class TestTagalogNumberConverter(unittest.TestCase):
     def test_invalid_input(self):
         self.assertEqual(tagalog_number(-1), "Negative numbers are not supported.")
         self.assertEqual(tagalog_number(1.5), "Input must be an integer.")
+    
+    def test_reverse_conversion(self):
+        self.assertEqual(tagalog_number_to_digits("sero"), 0)
+        self.assertEqual(tagalog_number_to_digits("isa"), 1)
+        self.assertEqual(tagalog_number_to_digits("dalawampu't lima"), 25)
+        self.assertEqual(tagalog_number_to_digits("isang daan at dalawampu't tatlo"), 123)
+        self.assertEqual(tagalog_number_to_digits("isang libo't dalawang daan at tatlumpu't apat"), 1234)
 
 if __name__ == '__main__':
     unittest.main()

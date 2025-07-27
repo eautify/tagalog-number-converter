@@ -1,3 +1,7 @@
+"""
+Utility functions for the Tagalog number converter.
+"""
+
 def validate_number(number):
     """
     Validates the input number for conversion.
