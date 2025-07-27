@@ -67,20 +67,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## License
 
-MIT
-```
-
-This README includes:
-1. Clear package description
-2. Installation instructions
-3. Usage examples for both conversion directions
-4. Supported number range
-5. Example conversion table
-6. Known limitations
-7. Contribution guidelines
-
-Would you like me to add or modify any sections? For example, we could add:
-- More detailed documentation about the grammar rules implemented
-- Development setup instructions
-- Testing information
-- Badges (version, license, etc.)
+MIT - See [LICENSE](LICENSE) for details.
