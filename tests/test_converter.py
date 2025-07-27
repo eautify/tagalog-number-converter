@@ -1,5 +1,5 @@
 import unittest
-from tagalog_number.converter import tagalog_number, tagalog_number_to_digits
+from converter import tagalog_number, tagalog_number_to_digits
 
 class TestTagalogNumberConverter(unittest.TestCase):
     def test_basic_numbers(self):
