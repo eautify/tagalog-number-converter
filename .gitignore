@@ -1,1 +1,46 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.eggs/
+
+# Virtual environment
 venv/
+env/
+.venv/
+/htmlcov/ # For coverage.py HTML reports
+
+# IDE-specific files
+.idea/                  # IntelliJ IDEA / PyCharm
+.vscode/                # VS Code (if you have user-specific settings you don't want to commit)
+*.iml                   # IntelliJ IDEA module files
+.DS_Store               # macOS specific desktop services store
+
+# Python build artifacts
+dist/
+build/
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-arg.txt
+
+# Unit test / coverage reports
+.coverage
+.tox/
+.pytest_cache/
+
+# Sphinx documentation build
+docs/_build/
+
+# Jupyter Notebook files
+.ipynb_checkpoints
+
+# Miscellaneous
+*~                  # Backup files
+*.bak               # Backup files
+*.swp               # Vim swap files
+.fuse_hidden*
+.directory
